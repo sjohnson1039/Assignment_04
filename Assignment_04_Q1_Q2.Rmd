@@ -1,0 +1,71 @@
+---
+title: "Assignment_04_Q1_Q2"
+author: "Stephen Johnson"
+date: "February 5, 2019"
+output: 
+  html_document:
+  keep_md: true
+---
+
+#1. Harry Potter Cast
+##a. Navigate to http://www.imdb.com/title/tt1201607/fullcredits?ref_=tt_ql_1
+
+##b. Scrape the page with any R package; table of the Cast and make into a data frame
+```{R echo=TRUE}
+library(rvest)
+library(stringr)
+url <- "http://www.imdb.com/title/tt1201607/fullcredits?ref_=tt_ql_1"
+imdb <- read_html(url)
+cast_actors <- html_nodes(imdb, '.cast_list')
+cast <- html_table(cast_actors, header = NA, trim = TRUE, fill = TRUE, dec = ".")
+```
+##c. Clean up the table
+```{R echo=TRUE}
+headers <- c("Actor", "Character")
+write.csv(cast, "imdb.csv", row.names = FALSE, na = "", fileEncoding = "UTF-8")
+df <- read.csv(file="imdb.csv", sep=",", colClasses=c( "NULL", NA, "NULL", NA))
+df2 <- head(df,90)
+colnames(df2) <- headers
+df2$Character <- gsub("\n","",df2$Character)
+```
+##d. Split the Actor's name into two columns
+```{R echo=TRUE}
+df2$Actorfirst <- gsub(" .+$","", df2$Actor)
+df2$Actorlast <- gsub("^.+ ","", df2$Actor)
+df2$Actor <- NULL
+
+##e. Present the first 10 rows
+head(df2,10)
+```
+#2. SportsBall
+##a. Navigate to http://www.espn.com/nba/team/stats/_/name/sa/san-antonio-spurs
+
+##b. Scrape the page with any R package; Shooting Statistics Table
+```{R echo=TRUE}
+library(XML)
+library(RCurl)
+library(rlist)
+library(tidyr)
+
+url2 <- "http://www.espn.com/nba/team/stats/_/name/sa/san-antonio-spurs"
+tables <- readHTMLTable(url2, trim=TRUE, as.data.frame = TRUE, header=TRUE)
+```
+##c. Clean up the table
+```{R echo=TRUE}
+df_shooting = as.data.frame(matrix(unlist(tables[[8]]),  nrow=length(unlist(tables[[8]][[1]]))))
+players = tables[6]
+df_shooting = cbind(players, df_shooting)
+df_shooting = separate(df_shooting, c("Name"), c("First Name","Last Name", "Position"), sep = " ")
+df_shooting = unite(df_shooting,"Name", c("First Name","Last Name"), sep = " ")
+header <- c("Name","Position","FGM","FGA","FG%","3PM","3PA","3P%","FTM","FTA",	"FT%",	"2PM",	"2PA",	"2P%",	"SC-EFF","SH-EFF")
+colnames(df_shooting) <- header
+```
+
+##d. Create a colorful barchart
+```{R echo=TRUE}
+barplot(t(as.matrix(df_shooting$`FG%`, df_shooting$Name)), names.arg = df_shooting$Name, main="Field Goals Percentage per Game", horiz = TRUE, xlab = "Field Goals Percentage", ylab = "Player", las=2, col="black")
+```
+
+
+
+

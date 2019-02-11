@@ -1,0 +1,27 @@
+---
+title: "Assignment_04"
+author: "Stephen Johnson"
+date: "January 30, 2019"
+output: html_document
+---
+
+#1. Harry Potter Cast
+##a. Navigate to http://www.imdb.com/title/tt1201607/fullcredits?ref_=tt_ql_
+url <- "https://www.imdb.com/title/tt1201607/fullcredits?ref_=tt_ql_1"
+
+##b. Scrape the page with any R package; table of the Cast and make into a data frame
+### install.packages("rvest")
+### library(rvest)
+webpage <- read_html(url)
+### print(class(webpage))
+cast_nodes <- html_nodes(webpage, '.cast_list')
+cast_text <- html_text(cast_nodes)
+cast_text
+cast_list = str_match_all(cast_text, '[a-zA-Z]+(?: +[a-zA-Z]+)+')
+df <- data.frame(col=cast_list)
+df
+### head(tbls)
+### tbl_cast <- webpage %>%
+###    html_nodes("table") %>%
+###    .[3] %>%
+###    html_table(fill = TRUE)

@@ -1,0 +1,17 @@
+---
+title: "Week5_Lecture"
+author: "Stephen Johnson"
+date: "February 4, 2019"
+output: html_document
+---
+
+{R echo=TRUE}
+# Place shortened url into URLAddress
+URLAddress <- "http://bit.ly/14aSjxB"
+# Download data
+DispropData <- repmis::source_data(URLAddress)
+var_names <- names(DispropData)
+var_names
+str(DispropData)
+summary(DispropData)
+'''
